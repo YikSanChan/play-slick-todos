@@ -12,7 +12,8 @@ class Application @Inject()(todoDao: TodoDAO, cc: ControllerComponents)(
     implicit ec: ExecutionContext)
     extends AbstractController(cc) {
   implicit val writesTodo = Json.writes[Todo]
-  implicit val readsTodoRequest = Json.reads[TodoRequest]
+  implicit val readsTodoRequest =
+    Json.using[Json.WithDefaultValues].reads[TodoRequest]
 
   def index = Action.async {
     todoDao.index().map { todos =>

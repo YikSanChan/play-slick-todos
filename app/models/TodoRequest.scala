@@ -1,3 +1,3 @@
 package models
 
-case class TodoRequest(content: String, priority: Int)
+case class TodoRequest(content: String, priority: Int = 3)
