@@ -16,10 +16,10 @@ class TodoDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
 
   def index(): Future[Seq[Todo]] = db.run(todos.result)
 
-  private class TodosTable(tag: Tag) extends Table[Todo](tag, "todo") {
+  private class TodosTable(tag: Tag) extends Table[Todo](tag, "TODO") {
 
-    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-    def content = column[String]("content")
+    def id = column[Long]("ID", O.PrimaryKey, O.AutoInc)
+    def content = column[String]("CONTENT")
 
     def * = (id, content) <> (Todo.tupled, Todo.unapply)
   }

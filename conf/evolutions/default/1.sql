@@ -1,0 +1,10 @@
+# --- !Ups
+
+create table "TODO" (
+  "ID" BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  "CONTENT" VARCHAR NOT NULL
+)
+
+# --- !Downs
+
+DROP TABLE Todo;
