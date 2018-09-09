@@ -20,12 +20,12 @@ class TodoDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
     todos.result
   }
 
-  def create(content: String): Future[Todo] = {
+  def create(content: String, priority: Int): Future[Todo] = {
     val todosReturningRow = todos returning todos.map(_.id) into { (todo, id) =>
       todo.copy(id = id)
     }
     db.run {
-      todosReturningRow += Todo(0L, content)
+      todosReturningRow += Todo(0L, content, priority)
     }
   }
 
@@ -33,14 +33,14 @@ class TodoDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
     byId(id).result.headOption
   }
 
-  def update(id: Long, content: String): Future[Option[Todo]] = {
+  def update(id: Long, content: String, priority: Int): Future[Option[Todo]] = {
     db.run {
       byId(id)
-        .map(todo => todo.content)
-        .update(content)
+        .map(todo => (todo.content, todo.priority))
+        .update((content, priority))
     } map {
       case 0 => None
-      case _ => Some(Todo(id, content))
+      case _ => Some(Todo(id, content, priority))
     }
   }
 
@@ -52,7 +52,8 @@ class TodoDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
 
     def id = column[Long]("ID", O.PrimaryKey, O.AutoInc)
     def content = column[String]("CONTENT")
+    def priority = column[Int]("PRIORITY")
 
-    def * = (id, content) <> (Todo.tupled, Todo.unapply)
+    def * = (id, content, priority) <> (Todo.tupled, Todo.unapply)
   }
 }

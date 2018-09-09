@@ -21,7 +21,7 @@ class Application @Inject()(todoDao: TodoDAO, cc: ControllerComponents)(
   }
 
   def create = Action.async(parse.json[TodoRequest]) { implicit request =>
-    todoDao.create(request.body.content) map { todo =>
+    todoDao.create(request.body.content, request.body.priority) map { todo =>
       Ok(Json.toJson(todo))
     }
   }
@@ -35,7 +35,7 @@ class Application @Inject()(todoDao: TodoDAO, cc: ControllerComponents)(
 
   def update(id: Long) = Action.async(parse.json[TodoRequest]) {
     implicit request =>
-      todoDao.update(id, request.body.content) map {
+      todoDao.update(id, request.body.content, request.body.priority) map {
         case Some(todo) => Ok(Json.toJson(todo))
         case None       => InternalServerError
       }

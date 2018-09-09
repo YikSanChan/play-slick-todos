@@ -1,3 +1,3 @@
 package models
 
-case class Todo(id: Long, content: String)
+case class Todo(id: Long, content: String, priority: Int)
