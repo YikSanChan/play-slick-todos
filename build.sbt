@@ -8,7 +8,7 @@ scalaVersion := "2.12.6"
 
 libraryDependencies += guice
 libraryDependencies += specs2 % Test
-libraryDependencies += "com.h2database" % "h2" % "1.4.197"
+libraryDependencies += "org.postgresql" % "postgresql" % "42.2.5"
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick" % "3.0.1",
   "com.typesafe.play" %% "play-slick-evolutions" % "3.0.1"

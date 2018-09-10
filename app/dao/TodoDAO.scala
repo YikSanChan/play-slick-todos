@@ -48,11 +48,11 @@ class TodoDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
     byId(id).delete
   }
 
-  private class TodosTable(tag: Tag) extends Table[Todo](tag, "TODO") {
+  private class TodosTable(tag: Tag) extends Table[Todo](tag, "todo") {
 
-    def id = column[Long]("ID", O.PrimaryKey, O.AutoInc)
-    def content = column[String]("CONTENT")
-    def priority = column[Int]("PRIORITY")
+    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+    def content = column[String]("content")
+    def priority = column[Int]("priority")
 
     def * = (id, content, priority) <> (Todo.tupled, Todo.unapply)
   }
