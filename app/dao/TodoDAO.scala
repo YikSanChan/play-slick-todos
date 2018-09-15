@@ -2,19 +2,16 @@ package dao
 
 import javax.inject.Inject
 import models.Status.Status
-import models.{Status, Todo}
+import models.Todo
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import slick.jdbc.JdbcProfile
+import utils.MyPostgresProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class TodoDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
     implicit ec: ExecutionContext)
-    extends HasDatabaseConfigProvider[JdbcProfile] {
-  import profile.api._
-
-  implicit val statusMapper =
-    MappedColumnType.base[Status, String](_.toString, Status.withName)
+    extends HasDatabaseConfigProvider[MyPostgresProfile] {
+  import MyPostgresProfile.api._
 
   private val todos = TableQuery[TodosTable]
 
