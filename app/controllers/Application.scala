@@ -23,7 +23,8 @@ class Application @Inject()(todoDao: TodoDAO, cc: ControllerComponents)(
   def create = Action.async(parse.json[CreateTodoRequest]) { implicit request =>
     todoDao.create(request.body.content,
                    request.body.priority,
-                   request.body.status) map { todo =>
+                   request.body.status,
+                   request.body.labels) map { todo =>
       Ok(Json.toJson(todo))
     }
   }
@@ -40,7 +41,8 @@ class Application @Inject()(todoDao: TodoDAO, cc: ControllerComponents)(
       todoDao.update(id,
                      request.body.content,
                      request.body.priority,
-                     request.body.status) map {
+                     request.body.status,
+                     request.body.labels) map {
         case Some(todo) => Ok(Json.toJson(todo))
         case None       => InternalServerError
       }

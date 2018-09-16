@@ -8,6 +8,8 @@ trait MyPostgresProfile extends ExPostgresProfile with PgEnumSupport {
 
   object MyAPI extends API {
     implicit val statusTypeMapper = createEnumJdbcType("status", models.Status)
+    implicit val labelListTypeMapper =
+      createEnumListJdbcType("labels", models.Label)
   }
 }
 

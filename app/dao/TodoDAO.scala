@@ -1,6 +1,7 @@
 package dao
 
 import javax.inject.Inject
+import models.Label.Label
 import models.Status.Status
 import models.Todo
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
@@ -21,12 +22,15 @@ class TodoDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
     todos.result
   }
 
-  def create(content: String, priority: Int, status: Status): Future[Todo] = {
+  def create(content: String,
+             priority: Int,
+             status: Status,
+             labels: List[Label]): Future[Todo] = {
     val todosReturningRow = todos returning todos.map(_.id) into { (todo, id) =>
       todo.copy(id = id)
     }
     db.run {
-      todosReturningRow += Todo(0L, content, priority, status)
+      todosReturningRow += Todo(0L, content, priority, status, labels)
     }
   }
 
@@ -37,14 +41,15 @@ class TodoDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
   def update(id: Long,
              content: String,
              priority: Int,
-             status: Status): Future[Option[Todo]] = {
+             status: Status,
+             labels: List[Label]): Future[Option[Todo]] = {
     db.run {
       byId(id)
-        .map(todo => (todo.content, todo.priority, todo.status))
-        .update((content, priority, status))
+        .map(todo => (todo.content, todo.priority, todo.status, todo.labels))
+        .update((content, priority, status, labels))
     } map {
       case 0 => None
-      case _ => Some(Todo(id, content, priority, status))
+      case _ => Some(Todo(id, content, priority, status, labels))
     }
   }
 
@@ -57,7 +62,8 @@ class TodoDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
     def content = column[String]("content")
     def priority = column[Int]("priority")
     def status = column[Status]("status")
+    def labels = column[List[Label]]("labels", O.Default(List.empty))
 
-    def * = (id, content, priority, status).mapTo[Todo]
+    def * = (id, content, priority, status, labels).mapTo[Todo]
   }
 }
