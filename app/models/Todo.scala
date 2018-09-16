@@ -1,18 +1,19 @@
 package models
 
 import models.Status.Status
-import play.api.libs.json.{Format, JsResult, JsValue, Json}
+import play.api.libs.json._
 
 object Status extends Enumeration {
   type Status = Value
   val NotStarted, InProgress, Finished = Value
 
-  implicit val formats: Format[Status] = new Format[Status] {
-    override def reads(json: JsValue): JsResult[Status] =
-      json.validate[String].map(Status.withName)
+  // TODO(#19): implicit val format = Json.formatEnum(this)
+  implicit val readsStatus = Reads.enumNameReads(Status)
+  implicit val writesStatus = Writes.enumNameWrites
+}
 
-    override def writes(o: Status): JsValue = Json.toJson(o.toString)
-  }
+object TodoFormat {
+  implicit val writesTodo = Json.writes[Todo]
 }
 
 case class Todo(id: Long, content: String, priority: Int, status: Status)

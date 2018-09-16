@@ -2,7 +2,9 @@ package controllers
 
 import dao.TodoDAO
 import javax.inject.Inject
-import models.{CreateTodoRequest, Todo, UpdateTodoRequest}
+import models.TodoFormat._
+import models.TodoRequestFormats._
+import models.{CreateTodoRequest, UpdateTodoRequest}
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
 
@@ -11,10 +13,6 @@ import scala.concurrent.ExecutionContext
 class Application @Inject()(todoDao: TodoDAO, cc: ControllerComponents)(
     implicit ec: ExecutionContext)
     extends AbstractController(cc) {
-  implicit val writesTodo = Json.writes[Todo]
-  implicit val readsCreateTodoRequest =
-    Json.using[Json.WithDefaultValues].reads[CreateTodoRequest]
-  implicit val readsUpdateTodoRequest = Json.reads[UpdateTodoRequest]
 
   def index = Action.async {
     todoDao.index().map { todos =>
