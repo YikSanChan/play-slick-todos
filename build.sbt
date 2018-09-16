@@ -1,6 +1,6 @@
 name := """play-slick-todos"""
 
-version := "1.0-SNAPSHOT"
+version := "2.6.x"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
