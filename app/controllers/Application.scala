@@ -2,7 +2,7 @@ package controllers
 
 import dao.TodoDAO
 import javax.inject.Inject
-import models.{Todo, TodoRequest}
+import models.{CreateTodoRequest, Todo, UpdateTodoRequest}
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, ControllerComponents}
 
@@ -12,8 +12,9 @@ class Application @Inject()(todoDao: TodoDAO, cc: ControllerComponents)(
     implicit ec: ExecutionContext)
     extends AbstractController(cc) {
   implicit val writesTodo = Json.writes[Todo]
-  implicit val readsTodoRequest =
-    Json.using[Json.WithDefaultValues].reads[TodoRequest]
+  implicit val readsCreateTodoRequest =
+    Json.using[Json.WithDefaultValues].reads[CreateTodoRequest]
+  implicit val readsUpdateTodoRequest = Json.reads[UpdateTodoRequest]
 
   def index = Action.async {
     todoDao.index().map { todos =>
@@ -21,7 +22,7 @@ class Application @Inject()(todoDao: TodoDAO, cc: ControllerComponents)(
     }
   }
 
-  def create = Action.async(parse.json[TodoRequest]) { implicit request =>
+  def create = Action.async(parse.json[CreateTodoRequest]) { implicit request =>
     todoDao.create(request.body.content,
                    request.body.priority,
                    request.body.status) map { todo =>
@@ -36,7 +37,7 @@ class Application @Inject()(todoDao: TodoDAO, cc: ControllerComponents)(
     }
   }
 
-  def update(id: Long) = Action.async(parse.json[TodoRequest]) {
+  def update(id: Long) = Action.async(parse.json[UpdateTodoRequest]) {
     implicit request =>
       todoDao.update(id,
                      request.body.content,
