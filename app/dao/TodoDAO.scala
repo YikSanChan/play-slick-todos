@@ -1,5 +1,6 @@
 package dao
 
+import com.google.inject.ImplementedBy
 import javax.inject.Inject
 import models.Status.Status
 import models.Todo
@@ -8,9 +9,23 @@ import utils.MyPostgresProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TodoDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
+@ImplementedBy(classOf[TodoDAOImpl])
+trait TodoDAO {
+  def index(): Future[Seq[Todo]]
+  def create(content: String, priority: Int, status: Status): Future[Todo]
+  def get(id: Long): Future[Option[Todo]]
+  def update(id: Long,
+             content: String,
+             priority: Int,
+             status: Status): Future[Option[Todo]]
+  def delete(id: Long): Future[Int]
+}
+
+class TodoDAOImpl @Inject()(
+    protected val dbConfigProvider: DatabaseConfigProvider)(
     implicit ec: ExecutionContext)
-    extends HasDatabaseConfigProvider[MyPostgresProfile] {
+    extends TodoDAO
+    with HasDatabaseConfigProvider[MyPostgresProfile] {
   import MyPostgresProfile.api._
 
   private val todos = TableQuery[TodosTable]
