@@ -13,7 +13,10 @@ import scala.concurrent.{ExecutionContext, Future}
 @ImplementedBy(classOf[TodoDAOImpl])
 trait TodoDAO {
   def index(): Future[Seq[Todo]]
-  def create(content: String, priority: Int, status: Status, labels: List[Label]): Future[Todo]
+  def create(content: String,
+             priority: Int,
+             status: Status,
+             labels: List[Label]): Future[Todo]
   def get(id: Long): Future[Option[Todo]]
   def update(id: Long,
              content: String,
