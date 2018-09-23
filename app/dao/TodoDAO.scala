@@ -13,29 +13,42 @@ import scala.concurrent.{ExecutionContext, Future}
 @ImplementedBy(classOf[TodoDAOImpl])
 trait TodoDAO {
   def index(): Future[Seq[Todo]]
+
   def create(content: String,
              priority: Int,
              status: Status,
              labels: List[Label]): Future[Todo]
+
   def get(id: Long): Future[Option[Todo]]
+
   def update(id: Long,
              content: String,
              priority: Int,
              status: Status,
              labels: List[Label]): Future[Option[Todo]]
+
   def delete(id: Long): Future[Int]
+}
+
+trait TodoDAOHelper {
+
+  import MyPostgresProfile.api._
+
+  val todos = TableQuery[TodosTable]
+  lazy val byId = (id: Long) => todos.filter(_.id === id)
+  val todosReturningRow = todos returning todos.map(_.id) into { (todo, id) =>
+    todo.copy(id = id)
+  }
 }
 
 class TodoDAOImpl @Inject()(
     protected val dbConfigProvider: DatabaseConfigProvider)(
     implicit ec: ExecutionContext)
-    extends TodoDAO
-    with HasDatabaseConfigProvider[MyPostgresProfile] {
+    extends HasDatabaseConfigProvider[MyPostgresProfile]
+    with TodoDAO
+    with TodoDAOHelper {
+
   import MyPostgresProfile.api._
-
-  private val todos = TableQuery[TodosTable]
-
-  private lazy val byId = (id: Long) => todos.filter(_.id === id)
 
   def index(): Future[Seq[Todo]] = db.run {
     todos.result
@@ -44,13 +57,8 @@ class TodoDAOImpl @Inject()(
   def create(content: String,
              priority: Int,
              status: Status,
-             labels: List[Label]): Future[Todo] = {
-    val todosReturningRow = todos returning todos.map(_.id) into { (todo, id) =>
-      todo.copy(id = id)
-    }
-    db.run {
-      todosReturningRow += Todo(0L, content, priority, status, labels)
-    }
+             labels: List[Label]): Future[Todo] = db.run {
+    todosReturningRow += Todo(0L, content, priority, status, labels)
   }
 
   def get(id: Long): Future[Option[Todo]] = db.run {
